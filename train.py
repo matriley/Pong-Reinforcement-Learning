@@ -1,85 +1,97 @@
+import pygame, random
+pygame.init()
+screen = pygame.display.set_mode((600, 400))
+clock = pygame.time.Clock()
 
-import random
+# initialize Q table
+q_table = {}
+for i in range(-10, 11):
+    for j in range(-10, 11):
+        for k in range(-10, 11):
+            for l in range(-10, 11):
+                q_table[(i, j, k, l)] = [random.uniform(0, 1) for _ in range(3)]
 
-class RockPaperScissors:
-    def __init__(self, learning_rate=0.9, discount_factor=4.95, exploration_rate=1.3, exploration_decay_rate=1.995):
-        self.learning_rate = learning_rate
-        self.discount_factor = discount_factor
-        self.exploration_rate = exploration_rate
-        self.exploration_decay_rate = exploration_decay_rate
-        self.q_table = {}
+# initialize game variables
+ball_x, ball_y = 300, 200
+ball_dx, ball_dy = random.choice([-4, 4]), random.choice([-4, 4])
+paddle1_y, paddle2_y = 150, 150
+score1, score2 = 0, 0
 
-    def get_action(self, state):
-        if state not in self.q_table:
-            self.q_table[state] = [0, 0, 0]
-        if random.random() < self.exploration_rate:
-            return random.choice([0, 1, 2])
-        else:
-            return self.q_table[state].index(max(self.q_table[state]))
+# update game state
+def update_game_state(action):
+    global ball_x, ball_y, ball_dx, ball_dy, paddle1_y, paddle2_y, score1, score2
+    if action == 0 and paddle1_y > 0:
+        paddle1_y -= 5
+    elif action == 2 and paddle1_y < 300:
+        paddle1_y += 5
+    ball_x += ball_dx
+    ball_y += ball_dy
+    if ball_y < 0 or ball_y > 390:
+        ball_dy *= -1
+    if ball_x < 20 and paddle1_y < ball_y < paddle1_y + 100:
+        ball_dx *= -1
+        score1 += 1
+    elif ball_x > 580 and paddle2_y < ball_y < paddle2_y + 100:
+        ball_dx *= -1
+        score2 += 1
+    elif ball_x < 0 or ball_x > 600:
+        ball_x, ball_y = 300, 200
+        ball_dx, ball_dy = random.choice([-4, 4]), random.choice([-4, 4])
+        score1, score2 = 0, 0
+    if ball_y < paddle2_y + 50 and paddle2_y > 0:
+        paddle2_y -= 5
+    elif ball_y > paddle2_y + 50 and paddle2_y < 300:
+        paddle2_y += 5
 
-    def update_q_table(self, state, action, reward, next_state):
-        if state not in self.q_table:
-            self.q_table[state] = [0, 0, 0]
-        if next_state not in self.q_table:
-            self.q_table[next_state] = [0, 0, 0]
-        old_value = self.q_table[state][action]
-        next_max = max(self.q_table[next_state])
-        new_value = (1 - self.learning_rate) * old_value + self.learning_rate * (reward + self.discount_factor * next_max)
-        self.q_table[state][action] = new_value
+# draw game objects
+def draw_game_objects():
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(0, paddle1_y, 10, 100))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(590, paddle2_y, 10, 100))
+    pygame.draw.circle(screen, (255, 255, 255), (int(ball_x), int(ball_y)), 10)
+    pygame.draw.line(screen, (255, 255, 255), (300, 0), (300, 400))
+    font = pygame.font.SysFont(None, 30)
+    score_text = font.render(str(score1) + " - " + str(score2), True, (255, 255, 255))
+    screen.blit(score_text, (260, 10))
+    pygame.display.flip()
 
-    def train(self, num_episodes):
-        for episode in range(num_episodes):
-            state = (0, 0)  # initial state
-            while True:
-                player_action = random.randint(0, 2)
-                if player_action not in [0, 1, 2]:
-                    print("Invalid move! Try again...")
-                    continue
-                opponent_action = random.randint(0, 2)
-                if player_action == opponent_action:
-                    print("It's a tie!")
-                    reward = 0
-                elif (player_action == 0 and opponent_action == 1) or (player_action == 1 and opponent_action == 2) or (player_action == 2 and opponent_action == 0):
-                    print("You lose!")
-                    reward = -1
-                else:
-                    print("You win!")
-                    reward = 1
-                next_state = (opponent_action, player_action)
-                self.update_q_table(state, player_action, reward, next_state)
-                state = next_state
-                if random.random() < self.exploration_decay_rate:
-                    self.exploration_rate *= self.exploration_decay_rate
-                if reward != 0:
-                    break
-            print("Q-table:")
-            print(self.q_table)
+# run game loop
+while True:
+    new_state = (int(ball_x / 10) - int(paddle1_y / 10), int(ball_y / 10), int(paddle2_y / 10), int(ball_dx / abs(ball_dx)), int(ball_dy / abs(ball_dy)))
 
-    def play(self):
-        while True:
-            state = (0, 0)  # initial state
-            while True:
-                player_action = int(input("Enter your move (0 = Rock, 1 = Paper, 2 = Scissors): "))
-                if player_action not in [0, 1, 2]:
-                    print("Invalid move! Try again...")
-                    continue
-                opponent_action = self.get_action(state)
-                if player_action == opponent_action:
-                    print("It's a tie!")
-                    reward = 0
-                elif (player_action == 0 and opponent_action == 1) or (player_action == 1 and opponent_action == 2) or (player_action == 2 and opponent_action == 0):
-                    print("You lose!")
-                    reward = -1
-                else:
-                    print("You win!")
-                    reward = 1
-                next_state = (opponent_action, player_action)
-                self.update_q_table(state, player_action, reward, next_state)
-                state = next_state
-                if reward != 0:
-                    print("Game Over!")
-                break
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
 
-rps = RockPaperScissors()
-rps.train(150000)
-rps.play()
+    # get current state and Q-values
+    state = new_state
+    q_values = q_table.get(state)
+    if q_values is None:
+        # initialize new state with random Q-values
+        q_table[state] = [random.uniform(0, 1) for _ in range(3)]
+
+    # choose action with highest Q-value
+    action = q_table[state].index(max(q_table[state]))
+
+    # update game state based on chosen action
+    update_game_state(action)
+
+    # draw game objects
+    draw_game_objects()
+
+    # get new state and update Q-value
+    new_state = (int(ball_x / 10) - int(paddle1_y / 10), int(ball_y / 10), int(paddle2_y / 10), int(ball_dx / abs(ball_dx)), int(ball_dy / abs(ball_dy)))
+
+    reward = score1 - score2
+  # get new state and update Q-value
+new_state = (int(ball_x / 10) - int(paddle1_y / 10), int(ball_y / 10), int(paddle2_y / 10), int(ball_dx / abs(ball_dx)), int(ball_dy / abs(ball_dy)))
+print("new state:", new_state)
+
+reward = score1 - score2
+q_table[state][action] += 0.1 * (reward + 0.9 * max(q_table[new_state]) - q_table[state][action])
+
+q_table[state][action] += 0.1 * (reward + 0.9 * max(q_table[new_state]) - q_table[state][action])
+
+    # limit game to 60 frames per second
+clock.tick(60)
