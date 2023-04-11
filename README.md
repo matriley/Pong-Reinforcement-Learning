@@ -1,16 +1,15 @@
-# Pong-Reinforcement-Learning
-This is a simple implementation of Pong game using Pygame and Reinforcement Learning.
-
-# What it does
-The game has two paddles, one controlled by the computer (Right paddle) and the other by the reinforcement learning algorithm (Left paddle). The goal of the algorithm is to learn to control the paddle to keep the ball from hitting the player's side and maximize the score. The reinforcement learning algorithm uses a Q-learning algorithm to update the Q-values of the state-action pairs, which is stored in a Q-table. The state is represented by the positions of the ball and the paddles, and the actions are moving the paddle up, staying put, or moving the paddle down.
-
-The Q-learning algorithm updates the Q-values based on the rewards obtained by the agent after taking an action in a state and moving to the next state. The algorithm chooses the action with the highest Q-value in the current state, takes the action, and then updates the Q-value of the state-action pair with the reward received and the highest Q-value in the new state. The agent repeats this process until it reaches the end of the episode.
+# Pong Reinforcement Learning
+This is a Python implementation of the classic game Pong, using reinforcement learning. The game is played by a neural network agent, which learns to play the game by trial and error. The agent receives the state of the game as input, and outputs an action (move the paddle up, down or stay in place).
 
 # Requirements
 ```
-python 3.9
-pygame
+Python 3.9
+Pygame
+Numpy
+Tensorflow 2.12.0
 ```
+# Usage
+To run the game and train the agent, simply run the train.py file. The agent will play 1000 games to train and the trained model will be saved as a .h5 file.
 
 # Usage
 To use this program, cd into the folder and simply run the train.py file or run the file in a Python environment.
@@ -19,14 +18,19 @@ $ git clone https://github.com/matriley/Pong-Reinforcement-Learning.git
 $ python3 train.py
 ```
 
-# How it works
-The game is implemented using Q-Learning algorithm. The Q-table is initialized with random values, and is updated every time the ball is hit. The state is represented by a tuple of five variables: ball x-coordinate, ball y-coordinate, paddle 1 y-coordinate, paddle 2 y-coordinate, and ball direction (dx and dy).
+# How It Works
+The code is written in Python 3.9, and uses the Pygame library for game rendering, Numpy for numerical computations and Tensorflow for building the neural network.
 
-The reward is calculated as the difference between the scores of the two players, and is used to update the Q-table using the following formula:
-```
-Q(s, a) += alpha * (reward + gamma * max(Q(s', a')) - Q(s, a))
-```
-Where s is the current state, a is the action taken, s' is the new state after taking the action, alpha is the learning rate, and gamma is the discount factor.
+The game is played by a neural network with three layers. The first layer has 128 neurons and uses the ReLU activation function, the second layer has 64 neurons and also uses ReLU activation, and the third layer has 3 neurons and uses linear activation. The neural network is trained using the Mean Squared Error loss function and the Adam optimizer with a learning rate of 0.001.
 
-# Furure updates
+The game state is represented by the ball's x and y coordinates, the ball's horizontal and vertical velocity, and the y coordinate of the left paddle. The state is preprocessed by converting it to a numpy array and reshaping it to a 1D array.
+
+The agent receives the state as input and outputs an action. The action is determined by the index of the highest output neuron in the neural network's output layer. The agent can move the paddle up, down, or stay in place.
+
+The agent's performance is evaluated using the reward system. If the agent wins the game, it receives a reward of 1, if it loses, it receives a reward of -1, and if the game ends in a tie, it receives a reward of 0.
+
+# Future Updates
 The code is still a work in progress, and there will be further changes to reach the final goal of the project. 
+
+* Performance Updates are the priority before moving forward. A new rendering library will be used in the future. 
+
