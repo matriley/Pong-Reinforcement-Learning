@@ -1,4 +1,4 @@
-# Pong Reinforcement Learning
+# Pong Using The Neural Network
 This is a Python implementation of the classic game Pong, using reinforcement learning. The game is played by a neural network agent, which learns to play the game by trial and error. The agent receives the state of the game as input, and outputs an action (move the paddle up, down or stay in place).
 
 # Requirements
