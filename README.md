@@ -29,4 +29,5 @@ Q(s, a) += alpha * (reward + gamma * max(Q(s', a')) - Q(s, a))
 Where s is the current state, a is the action taken, s' is the new state after taking the action, alpha is the learning rate, and gamma is the discount factor.
 
 # Furure updates
-The code is still a work in progress, and there will be further changes to reach the final goal of the project. 
+* Working on a neural network version, opposed to only reinforcement learning.
+* Updating code to render with OpenGL to improve performance. 
