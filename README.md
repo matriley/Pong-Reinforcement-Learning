@@ -30,7 +30,8 @@ The agent receives the state as input and outputs an action. The action is deter
 The agent's performance is evaluated using the reward system. If the agent wins the game, it receives a reward of 1, if it loses, it receives a reward of -1, and if the game ends in a tie, it receives a reward of 0.
 
 # Future Updates
-The code is still a work in progress, and there will be further changes to reach the final goal of the project. 
+The code is still a work in progress, and there will be further changes to reach the final goal of the project. Such as:
 
-* Performance Updates are the priority before moving forward. A new rendering library will be used in the future. 
+* Using OpenGL for rendering 
+* Further adjustments to code to optimize performance
 
